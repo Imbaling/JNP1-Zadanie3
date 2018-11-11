@@ -11,12 +11,13 @@
 #include <vector>
 #include <ctime>
 #include <chrono>
+#include <cstddef>
 #include <boost/operators.hpp>
 
 class Operation
 {
 private:
-    std::chrono::system_clock::time_point time;
+    std::chrono::system_clock::time_point timestamp;
     unsigned long units;
 public:
     Operation(unsigned long);
@@ -38,18 +39,22 @@ public:
     Wallet(Wallet &&);
     Wallet(Wallet &&, Wallet &&);
 
+    Wallet & operator = (Wallet &&);
     unsigned long getUnits() const;
-    unsigned long opSize() const;
+    std::size_t opSize() const;
     const Operation operator[](unsigned long) const;
     void operator += (Wallet &);
 
     friend std::ostream& operator<< (std::ostream&, const Wallet &);
 private:
-    void addNewOperation();
+    static const unsigned long UNITS_IN_ONE_B = 1e8;
+
     unsigned long units;
     std::vector<Operation> history;
+
+    void addNewOperation();
 };
 
 const Wallet Empty();
 
-#endif //JNP1_ZADANIE3_WALLET_H
+#endif // JNP1_ZADANIE3_WALLET_H
