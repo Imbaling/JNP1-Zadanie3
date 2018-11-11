@@ -40,12 +40,23 @@ public:
     Wallet(Wallet &&, Wallet &&);
 
     Wallet & operator = (Wallet &&);
+    Wallet & operator += (Wallet &wallet);
+    Wallet & operator -= (Wallet &wallet);
+    Wallet & operator *= (unsigned long multiplier);
+    Wallet & operator += (Wallet &&wallet);
+    Wallet & operator -= (Wallet &&wallet);
+
     unsigned long getUnits() const;
     std::size_t opSize() const;
     const Operation operator[](unsigned long) const;
-    void operator += (Wallet &);
 
     friend std::ostream& operator<< (std::ostream&, const Wallet &);
+    friend Wallet operator + (Wallet &&wallet1, Wallet &wallet2);
+    friend Wallet operator - (Wallet &&wallet1, Wallet &wallet2);
+    friend Wallet operator + (Wallet &&wallet1, Wallet &wallet2);
+    friend Wallet operator - (Wallet &&wallet1, Wallet &&wallet2);
+    friend Wallet operator * (Wallet &&wallet, unsigned long multiplier);
+    friend Wallet operator * (unsigned long multiplier, Wallet &&wallet);
 private:
     static const unsigned long UNITS_IN_ONE_B = 1e8;
 

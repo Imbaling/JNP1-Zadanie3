@@ -80,6 +80,46 @@ Wallet::Wallet(Wallet &&wallet1, Wallet &&wallet2)
     addNewOperation();
 }
 
+Wallet & Wallet::operator += (Wallet &wallet)
+{
+    units += wallet.units;
+    wallet.units = 0;
+
+    addNewOperation();
+    wallet.addNewOperation();
+
+    return *this;
+}
+
+Wallet & Wallet::operator += (Wallet &&wallet)
+{
+    return (*this) += wallet;
+}
+
+Wallet & Wallet::operator -= (Wallet &wallet)
+{
+    units -= wallet.units;
+    wallet.units *= 2l;
+
+    addNewOperation();
+    wallet.addNewOperation();
+
+    return *this;
+}
+
+Wallet & Wallet::operator -= (Wallet &&wallet)
+{
+    return (*this) -= wallet;
+}
+
+Wallet & Wallet::operator *= (unsigned long multiplier)
+{
+    units *= multiplier;
+    addNewOperation();
+
+    return *this;
+}
+
 Wallet & Wallet::operator = (Wallet &&wallet)
 {
     if (this == &wallet)
@@ -116,15 +156,6 @@ std::size_t Wallet::opSize() const
     return history.size();
 }
 
-void Wallet::operator+=(Wallet & w1)
-{
-    unsigned long tmp = w1.units;
-    w1.units = 0;
-    units = tmp;
-    w1.addNewOperation();
-    addNewOperation();
-}
-
 void Wallet::addNewOperation()
 {
     history.push_back(units);
@@ -135,6 +166,42 @@ std::ostream &operator<<(std::ostream & os, const Operation & operation)
     std::time_t tmp = std::chrono::system_clock::to_time_t(operation.timestamp);
     os << "Wallet balance is " << operation.units << " B after operation made at day " << std::put_time(std::localtime(&tmp), "%F");
     return os;
+}
+
+Wallet operator + (Wallet &&wallet1, Wallet &wallet2)
+{
+    Wallet result = std::move(wallet1 += wallet2);
+    result.history.pop_back();
+    return result;
+}
+
+Wallet operator + (Wallet &&wallet1, Wallet &&wallet2)
+{
+    return std::move(wallet1) + wallet2;
+}
+
+Wallet operator - (Wallet &&wallet1, Wallet &wallet2)
+{
+    Wallet result = std::move(wallet1 += wallet2);
+    result.history.pop_back();
+    return result;
+}
+
+Wallet operator - (Wallet &&wallet1, Wallet &&wallet2)
+{
+    return std::move(wallet1) - wallet2;
+}
+
+Wallet operator * (Wallet &&wallet, unsigned long multiplier)
+{
+    Wallet result = std::move(wallet *= multiplier);
+    result.history.pop_back();
+    return result;
+}
+
+Wallet operator * (unsigned long multiplier, Wallet &&wallet)
+{
+    return std::move(wallet) * multiplier;
 }
 
 const Wallet Empty()
