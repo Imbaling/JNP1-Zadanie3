@@ -12,35 +12,40 @@
 #include <cstddef>
 #include <boost/operators.hpp>
 
-class Operation
+class Operation : public boost::equality_comparable<Operation>, public boost::less_than_comparable<Operation>
 {
 private:
     friend class Wallet;
 
-    Operation(unsigned long long);
-
     std::chrono::system_clock::time_point timestamp;
     unsigned long long units;
-
+    // Zakrywam dostęp do konstruktorów
+    Operation(unsigned long long);
+    Operation() = default;
 public:
     unsigned long long getUnits() const;
-    bool operator < (const Operation &);
-    bool operator > (const Operation &);
-    bool operator == (const Operation &);
+    // Pozostałe operatory są generowane automatycznie
+    const bool operator < (const Operation &) const;
+    const bool operator > (const Operation &) const;
+    const bool operator == (const Operation &) const;
 
     friend std::ostream& operator<< (std::ostream&, const Operation &);
 };
 
-class Wallet
+class Wallet : public boost::equality_comparable<Wallet>, public boost::less_than_comparable<Wallet>
 {
 public:
     static Wallet fromBinary(const std::string &);
 
     Wallet();
-    Wallet(unsigned long);
-    Wallet(const std::string &);
-    Wallet(Wallet &&);
-    Wallet(Wallet &&, Wallet &&);
+    explicit Wallet(unsigned long);
+    explicit Wallet(const std::string &);
+    explicit Wallet(Wallet &&);
+    explicit Wallet(Wallet &&, Wallet &&);
+
+    const bool operator < (const Wallet &) const;
+    const bool operator > (const Wallet &) const;
+    const bool operator == (const Wallet &) const;
 
     Wallet & operator = (Wallet &&);
     Wallet & operator += (Wallet &wallet);

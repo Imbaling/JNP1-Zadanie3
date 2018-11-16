@@ -19,17 +19,17 @@ unsigned long long Operation::getUnits() const
     return units;
 }
 
-bool Operation::operator<(const Operation & b)
+const bool Operation::operator<(const Operation & b) const
 {
     return timestamp < b.timestamp;
 }
 
-bool Operation::operator>(const Operation & b)
+const bool Operation::operator>(const Operation & b) const
 {
     return timestamp > b.timestamp;
 }
 
-bool Operation::operator==(const Operation & b)
+const bool Operation::operator == (const Operation & b) const
 {
     return timestamp == b.timestamp;
 }
@@ -134,8 +134,7 @@ Wallet & Wallet::operator -= (Wallet &wallet)
 {
     if (units < wallet.units)
     {
-        throw std::invalid_argument("Attempt to subtract more units than present \
-in the given wallet.");
+        throw std::invalid_argument("Attempt to subtract more units than present in the given wallet.");
     }
 
     units -= wallet.units;
@@ -201,6 +200,21 @@ const Operation Wallet::operator[](unsigned long i) const
 std::size_t Wallet::opSize() const
 {
     return history.size();
+}
+
+const bool Wallet::operator < (const Wallet & wallet) const
+{
+    return units < wallet.units;
+}
+
+const bool Wallet::operator > (const Wallet & wallet) const
+{
+    return units > wallet.units;
+}
+
+const bool Wallet::operator == (const Wallet & wallet) const
+{
+    return units == wallet.units;
 }
 
 Wallet operator + (Wallet &&wallet1, Wallet &wallet2)
