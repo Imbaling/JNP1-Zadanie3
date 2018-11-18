@@ -214,9 +214,14 @@ const bool Wallet::operator > (const Wallet & wallet) const
     return units > wallet.units;
 }
 
-const bool Wallet::operator == (const Wallet & wallet) const
+const bool operator == (const Wallet & wallet,const Wallet & wallet1)
 {
-    return units == wallet.units;
+    return wallet.units == wallet1.units;
+}
+
+const bool operator == (Wallet & wallet, const Wallet & wallet1)
+{
+    return wallet.units == wallet1.units;
 }
 
 Wallet operator + (Wallet &&wallet1, Wallet &wallet2)
@@ -226,7 +231,7 @@ Wallet operator + (Wallet &&wallet1, Wallet &wallet2)
     return result;
 }
 
-Wallet operator + (Wallet &&wallet1, Wallet &&wallet2)
+ Wallet operator + (Wallet &&wallet1, Wallet &&wallet2)
 {
     return std::move(wallet1) + wallet2;
 }

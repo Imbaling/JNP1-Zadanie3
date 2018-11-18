@@ -32,20 +32,23 @@ public:
     friend std::ostream& operator<< (std::ostream&, const Operation &);
 };
 
-class Wallet : public boost::equality_comparable<Wallet>, public boost::less_than_comparable<Wallet>
+class Wallet : public boost::equality_comparable<Wallet, Wallet>, public boost::less_than_comparable<Wallet, Wallet>
 {
 public:
     static Wallet fromBinary(const std::string &);
 
     Wallet();
-    explicit Wallet(unsigned long);
+    Wallet(unsigned long);
     explicit Wallet(const std::string &);
     explicit Wallet(Wallet &&);
     explicit Wallet(Wallet &&, Wallet &&);
 
     const bool operator < (const Wallet &) const;
     const bool operator > (const Wallet &) const;
-    const bool operator == (const Wallet &) const;
+    //const bool operator == (const Wallet &);
+
+    friend const bool operator == (const Wallet & wallet, const Wallet & wallet1);
+    friend const bool operator == (Wallet & wallet,const Wallet & wallet1);
 
     Wallet & operator = (Wallet &&);
     Wallet & operator += (Wallet &wallet);
