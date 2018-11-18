@@ -65,6 +65,8 @@ public:
     friend Wallet operator - (Wallet &&wallet1, Wallet &&wallet2);
     friend Wallet operator * (Wallet &&wallet, unsigned long long multiplier);
     friend Wallet operator * (unsigned long long multiplier, Wallet &&wallet);
+
+    ~Wallet();
 private:
     static const unsigned long long MAX_NUMBER_OF_B = 2.1e7;
     static const unsigned long long UNITS_IN_ONE_B = 1e8;
@@ -72,11 +74,17 @@ private:
         UNITS_IN_ONE_B;
     static const unsigned int MAX_NUMBER_OF_B_LOG_CEIL = 25;
 
+    static unsigned long long currentLimitOfUnits;
+
     unsigned long long units;
     std::vector<Operation> history;
 
+    // This function is used only when we modify (add or remove) new units from
+    // the global pool. It adds the given number of units (could be negative)
+    // to the given Wallet object. It also keep track of the remaining units
+    // in the global pool.
+    void addNewUnits(long long);
     void addNewOperation();
-    void addNewUnits(unsigned long long);
 };
 
 const Wallet Empty();

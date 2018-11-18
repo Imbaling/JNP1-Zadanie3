@@ -9,6 +9,8 @@
 
 #include "wallet.h"
 
+unsigned long long Wallet::currentLimitOfUnits = MAX_NUMBER_OF_UNITS;
+
 Operation::Operation(unsigned long long unitsAfterOperation): units(unitsAfterOperation)
 {
     timestamp = std::chrono::system_clock::now();
@@ -253,6 +255,11 @@ Wallet operator * (unsigned long long multiplier, Wallet &&wallet)
     return std::move(wallet) * multiplier;
 }
 
+Wallet::~Wallet()
+{
+    addNewUnits(-((long long)units));
+}
+
 const Wallet Empty()
 {
     return Wallet();
@@ -300,11 +307,9 @@ void Wallet::addNewOperation()
     history.push_back(units);
 }
 
-void Wallet::addNewUnits(unsigned long long newUnits)
+void Wallet::addNewUnits(long long newUnits)
 {
-    static unsigned long long currentLimitOfUnits = MAX_NUMBER_OF_UNITS;
-
-    if (newUnits > currentLimitOfUnits)
+    if (newUnits > (long long)currentLimitOfUnits)
     {
         throw std::invalid_argument("Number of new units exceeded \
 the current limit.");
