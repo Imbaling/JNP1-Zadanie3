@@ -19,12 +19,12 @@ private:
 
     std::chrono::system_clock::time_point timestamp;
     unsigned long long units;
-    // Zakrywam dostęp do konstruktorów
+
     Operation(unsigned long long);
     Operation() = default;
 public:
     unsigned long long getUnits() const;
-    // Pozostałe operatory są generowane automatycznie
+
     const bool operator < (const Operation &) const;
     const bool operator > (const Operation &) const;
     const bool operator == (const Operation &) const;
@@ -39,16 +39,16 @@ public:
 
     Wallet();
     Wallet(unsigned long);
+    Wallet(int);
     explicit Wallet(const std::string &);
-    explicit Wallet(Wallet &&);
-    explicit Wallet(Wallet &&, Wallet &&);
+    explicit Wallet(const char*);
+    Wallet(Wallet &&);
+    Wallet(Wallet &&, Wallet &&);
 
-    const bool operator < (const Wallet &) const;
-    const bool operator > (const Wallet &) const;
-    //const bool operator == (const Wallet &);
+    template<typename T> Wallet(T arg) = delete;
 
+    friend const bool operator < (const Wallet & wallet, const Wallet & wallet1);
     friend const bool operator == (const Wallet & wallet, const Wallet & wallet1);
-    friend const bool operator == (Wallet & wallet,const Wallet & wallet1);
 
     Wallet & operator = (Wallet &&);
     Wallet & operator += (Wallet &wallet);
@@ -62,15 +62,17 @@ public:
     const Operation operator[](unsigned long) const;
 
     friend std::ostream& operator<< (std::ostream&, const Wallet &);
+    friend std::ostream &operator<<(std::ostream & os, const Operation & operation);
     friend Wallet operator + (Wallet &&wallet1, Wallet &wallet2);
     friend Wallet operator - (Wallet &&wallet1, Wallet &wallet2);
-    friend Wallet operator + (Wallet &&wallet1, Wallet &wallet2);
+    friend Wallet operator + (Wallet &&wallet1, Wallet &&wallet2);
     friend Wallet operator - (Wallet &&wallet1, Wallet &&wallet2);
     friend Wallet operator * (Wallet &&wallet, unsigned long long multiplier);
     friend Wallet operator * (unsigned long long multiplier, Wallet &&wallet);
 
     ~Wallet();
 private:
+
     static const unsigned long long MAX_NUMBER_OF_B = 2.1e7;
     static const unsigned long long UNITS_IN_ONE_B = 1e8;
     static const unsigned long long MAX_NUMBER_OF_UNITS = MAX_NUMBER_OF_B *
@@ -78,6 +80,8 @@ private:
     static const unsigned int MAX_NUMBER_OF_B_LOG_CEIL = 25;
 
     static unsigned long long currentLimitOfUnits;
+    // Returns string formated for printing
+    static std::string formatUnits(unsigned long);
 
     unsigned long long units;
     std::vector<Operation> history;
@@ -90,6 +94,6 @@ private:
     void addNewOperation();
 };
 
-const Wallet Empty();
+const Wallet & Empty();
 
 #endif // JNP1_ZADANIE3_WALLET_H

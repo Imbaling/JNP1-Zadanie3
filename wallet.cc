@@ -6,6 +6,7 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
+#include <string>
 
 #include "wallet.h"
 
@@ -39,9 +40,7 @@ const bool Operation::operator == (const Operation & b) const
 std::ostream &operator<<(std::ostream & os, const Operation & operation)
 {
     std::time_t tmp = std::chrono::system_clock::to_time_t(operation.timestamp);
-    os << "Wallet balance is " <<
-        operation.units <<
-        " B after operation made at day " <<
+    os << "Wallet balance is " << Wallet::formatUnits(operation.units) <<  " B after operation made at day " <<
         std::put_time(std::localtime(&tmp), "%F");
     return os;
 }
@@ -67,16 +66,45 @@ Wallet::Wallet(unsigned long numberOfB)
     addNewOperation();
 }
 
+Wallet::Wallet(int numberOfB)
+{
+    units = 0;
+
+    if(numberOfB < 0)
+    {
+        throw std::invalid_argument("Argument " + std::to_string(numberOfB) +
+                                    "  given to the Wallet's constructor is negative");
+    }
+
+    if (numberOfB > MAX_NUMBER_OF_B)
+    {
+        throw std::invalid_argument("Argument " + std::to_string(numberOfB) +
+                                    " given to the Wallet's constructor represents too many Bs");
+    }
+
+    addNewUnits(UNITS_IN_ONE_B * numberOfB);
+    addNewOperation();
+}
+
+Wallet::Wallet(const char *str) : Wallet(std::string(str)){}
+
 Wallet::Wallet(const std::string & str)
 {
     units = 0;
-    double tmp = stod(str);
+    std::string in = str;
+    // Check if string constains commas
+    if(in.find(',') != std::string::npos)
+    {
+        in.replace(in.find(','), 1, ".");
+    }
 
     if (str.find("-") != std::string::npos)
     {
         throw std::invalid_argument("Argument " + str +
-            " given to the Wallet's constructor represents negative number of Bs");
+                                    " given to the Wallet's constructor represents negative number of Bs");
     }
+
+    double tmp = stod(in);
 
     // Plus 1 is added to negate possible floating point inaccuracies.
     if (tmp > (double)MAX_NUMBER_OF_B + 1)
@@ -184,8 +212,7 @@ Wallet & Wallet::operator = (Wallet &&wallet)
 
 std::ostream &operator<<(std::ostream & os, const Wallet & wallet)
 {
-    os << "Wallet[" <<
-        std::to_string(wallet.units / (double)Wallet::UNITS_IN_ONE_B) << " B]";
+    os << "Wallet[" << Wallet::formatUnits(wallet.units) << " B]";
     return os;
 }
 
@@ -204,14 +231,9 @@ std::size_t Wallet::opSize() const
     return history.size();
 }
 
-const bool Wallet::operator < (const Wallet & wallet) const
+const bool operator < (const Wallet & wallet, const Wallet & wallet1)
 {
-    return units < wallet.units;
-}
-
-const bool Wallet::operator > (const Wallet & wallet) const
-{
-    return units > wallet.units;
+    return wallet.units < wallet1.units;
 }
 
 const bool operator == (const Wallet & wallet,const Wallet & wallet1)
@@ -219,10 +241,6 @@ const bool operator == (const Wallet & wallet,const Wallet & wallet1)
     return wallet.units == wallet1.units;
 }
 
-const bool operator == (Wallet & wallet, const Wallet & wallet1)
-{
-    return wallet.units == wallet1.units;
-}
 
 Wallet operator + (Wallet &&wallet1, Wallet &wallet2)
 {
@@ -265,9 +283,10 @@ Wallet::~Wallet()
     addNewUnits(-((long long)units));
 }
 
-const Wallet Empty()
+const Wallet & Empty()
 {
-    return Wallet();
+    static const Wallet *wallet = new Wallet();
+    return *wallet;
 }
 
 Wallet Wallet::fromBinary(const std::string &str)
@@ -303,7 +322,7 @@ Wallet Wallet::fromBinary(const std::string &str)
     }
     else
     {
-        return Wallet(std::stol(str, nullptr, 2));
+        return Wallet((unsigned long) std::stol(str, nullptr, 2));
     }
 }
 
@@ -322,4 +341,28 @@ the current limit.");
 
     units += newUnits;
     currentLimitOfUnits -= newUnits;
+}
+// Returns string formated for printing
+std::string Wallet::formatUnits(unsigned long units)
+{
+    std::string in = std::to_string(units / (double)Wallet::UNITS_IN_ONE_B);
+    // Check if string contains commas
+    unsigned long index = in.find('.');
+    if(index != std::string::npos)
+    {
+        in.replace(index, 1, ",");
+    }
+    unsigned long i = in.size() - 1;
+    // Removes trailing 0
+    while (in[i] == '0')
+    {
+        i--;
+    }
+
+    if(i + 2 < in.size())
+    {
+        in.erase(i + 2, in.size() - i);
+    }
+
+    return in;
 }
