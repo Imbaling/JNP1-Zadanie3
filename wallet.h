@@ -25,9 +25,9 @@ private:
 public:
     unsigned long long getUnits() const;
 
-    const bool operator < (const Operation &) const;
-    const bool operator > (const Operation &) const;
-    const bool operator == (const Operation &) const;
+    bool operator < (const Operation &) const;
+    bool operator > (const Operation &) const;
+    bool operator == (const Operation &) const;
 
     friend std::ostream& operator<< (std::ostream&, const Operation &);
 };
@@ -47,8 +47,8 @@ public:
 
     template<typename T> Wallet(T arg) = delete;
 
-    friend const bool operator < (const Wallet & wallet, const Wallet & wallet1);
-    friend const bool operator == (const Wallet & wallet, const Wallet & wallet1);
+    friend bool operator < (const Wallet & wallet, const Wallet & wallet1);
+    friend bool operator == (const Wallet & wallet, const Wallet & wallet1);
 
     Wallet & operator = (Wallet &&);
     Wallet & operator += (Wallet &wallet);

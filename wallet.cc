@@ -22,17 +22,17 @@ unsigned long long Operation::getUnits() const
     return units;
 }
 
-const bool Operation::operator<(const Operation & b) const
+bool Operation::operator<(const Operation & b) const
 {
     return timestamp < b.timestamp;
 }
 
-const bool Operation::operator>(const Operation & b) const
+bool Operation::operator>(const Operation & b) const
 {
     return timestamp > b.timestamp;
 }
 
-const bool Operation::operator == (const Operation & b) const
+bool Operation::operator == (const Operation & b) const
 {
     return timestamp == b.timestamp;
 }
@@ -76,7 +76,7 @@ Wallet::Wallet(int numberOfB)
                                     "  given to the Wallet's constructor is negative");
     }
 
-    if (numberOfB > MAX_NUMBER_OF_B)
+    if (numberOfB > (long long)MAX_NUMBER_OF_B)
     {
         throw std::invalid_argument("Argument " + std::to_string(numberOfB) +
                                     " given to the Wallet's constructor represents too many Bs");
@@ -231,12 +231,12 @@ std::size_t Wallet::opSize() const
     return history.size();
 }
 
-const bool operator < (const Wallet & wallet, const Wallet & wallet1)
+bool operator < (const Wallet & wallet, const Wallet & wallet1)
 {
     return wallet.units < wallet1.units;
 }
 
-const bool operator == (const Wallet & wallet,const Wallet & wallet1)
+bool operator == (const Wallet & wallet,const Wallet & wallet1)
 {
     return wallet.units == wallet1.units;
 }
