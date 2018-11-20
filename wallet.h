@@ -61,14 +61,16 @@ public:
     std::size_t opSize() const;
     const Operation operator[](unsigned long) const;
 
-    friend std::ostream& operator<< (std::ostream&, const Wallet &);
+    friend std::ostream & operator<< (std::ostream&, const Wallet &);
     friend std::ostream &operator<<(std::ostream & os, const Operation & operation);
     friend Wallet operator + (Wallet &&wallet1, Wallet &wallet2);
     friend Wallet operator - (Wallet &&wallet1, Wallet &wallet2);
     friend Wallet operator + (Wallet &&wallet1, Wallet &&wallet2);
     friend Wallet operator - (Wallet &&wallet1, Wallet &&wallet2);
-    friend Wallet operator * (Wallet &&wallet, unsigned long long multiplier);
-    friend Wallet operator * (unsigned long long multiplier, Wallet &&wallet);
+    friend Wallet && operator * (Wallet &wallet, unsigned long long multiplier);
+    friend Wallet && operator * (unsigned long long multiplier, Wallet &wallet);
+    friend Wallet && operator * (Wallet &&wallet, unsigned long long multiplier);
+    friend Wallet && operator * (unsigned long long multiplier, Wallet &&wallet);
 
     ~Wallet();
 private:

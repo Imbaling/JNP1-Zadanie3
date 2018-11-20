@@ -266,16 +266,24 @@ Wallet operator - (Wallet &&wallet1, Wallet &&wallet2)
     return std::move(wallet1) - wallet2;
 }
 
-Wallet operator * (Wallet &&wallet, unsigned long long multiplier)
+Wallet &&operator * (Wallet &&wallet, unsigned long long multiplier)
 {
-    Wallet result = std::move(wallet *= multiplier);
-    result.history.pop_back();
-    return result;
+    return wallet * multiplier;
 }
 
-Wallet operator * (unsigned long long multiplier, Wallet &&wallet)
+Wallet &&operator * (unsigned long long multiplier, Wallet &&wallet)
 {
-    return std::move(wallet) * multiplier;
+    return wallet * multiplier;
+}
+
+Wallet &&operator * (Wallet &wallet, unsigned long long multiplier)
+{
+    return std::move(wallet *= multiplier);
+}
+
+Wallet &&operator * (unsigned long long multiplier, Wallet &wallet)
+{
+    return wallet * multiplier;
 }
 
 Wallet::~Wallet()
